@@ -30,7 +30,7 @@ python3 -m http.server 8080
 
 ```bash
 docker run -d --name vps-calculator --restart unless-stopped \
-  -p 8080:80 wangsc1/vps-calculator:latest
+  -p 20100:80 wangsc1/vps-calculator:latest
 ```
 
 或使用 Docker Compose：
@@ -39,7 +39,7 @@ docker run -d --name vps-calculator --restart unless-stopped \
 docker compose up -d
 ```
 
-默认端口为 `8080`，可通过环境变量 `VPS_CALC_PORT` 修改。镜像支持 `linux/amd64` 和 `linux/arm64`。
+默认端口为 `20100`，可通过环境变量 `VPS_CALC_PORT` 修改。镜像支持 `linux/amd64` 和 `linux/arm64`。
 
 本地构建：
 
