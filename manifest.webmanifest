@@ -1,0 +1,10 @@
+{
+  "name": "VPS Value · 剩余价值计算器",
+  "short_name": "VPS Value",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#08111f",
+  "theme_color": "#6875f5",
+  "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
