@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#08111f">
-  <meta name="description" content="简洁、准确、隐私友好的 VPS 剩余价值计算器，支持实时汇率、交易溢价、分享链接和图片导出。">
+  <meta name="description" content="简洁、准确、隐私友好的 VPS 剩余价值计算器，支持实时汇率、交易溢价和卡片导出。">
   <meta property="og:title" content="VPS Value · 剩余价值计算器">
   <meta property="og:description" content="计算 VPS 剩余天数、折算价值与交易价格。">
   <title>VPS Value · 剩余价值计算器</title>
@@ -160,14 +160,13 @@
           <div class="deal-heading"><div><span>交易估值</span><small>输入其一，另一项自动计算</small></div><span class="deal-badge" id="dealBadge">原价转让</span></div>
           <div class="deal-fields">
             <label><span>溢价 / 折价</span><div><b>¥</b><input id="premium" type="number" step="0.01" inputmode="decimal" placeholder="0.00"></div></label>
-            <label><span>建议售价</span><div><b>¥</b><input id="salePrice" type="number" step="0.01" inputmode="decimal" placeholder="0.00"></div></label>
+            <label><span>售出价格</span><div><b>¥</b><input id="salePrice" type="number" step="0.01" inputmode="decimal" placeholder="0.00"></div></label>
           </div>
         </div>
 
         <div class="action-grid">
           <button id="copyDetails" type="button" class="button secondary"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>复制结果</button>
-          <button id="shareLink" type="button" class="button secondary" title="复制 Markdown 格式分享链接" aria-label="复制 Markdown 格式分享链接"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/></svg>分享链接</button>
-          <button id="exportImage" type="button" class="button primary"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>导出卡片</button>
+          <button id="exportImage" type="button" class="button primary" title="导出卡片并复制 Markdown 链接" aria-label="导出卡片并复制 Markdown 链接"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m21 15-5-5L5 20"/></svg>导出卡片</button>
         </div>
       </section>
     </main>
@@ -181,7 +180,7 @@
   <div class="toast" id="toast" role="status"></div>
 
   <dialog id="imageDialog">
-    <div class="dialog-head"><div><strong>分享卡片</strong><small>长按图片保存，或使用下方按钮</small></div><button id="closeDialog" aria-label="关闭">×</button></div>
+    <div class="dialog-head"><div><strong>分享卡片</strong><small>Markdown 链接已复制，长按图片可保存</small></div><button id="closeDialog" aria-label="关闭">×</button></div>
     <div class="image-stage" id="imageStage"><span class="spinner"></span><img id="generatedImage" alt="VPS 剩余价值分享卡片"></div>
     <div class="dialog-actions"><a id="downloadImage" class="button primary" download="vps-value.png">下载 PNG</a><button id="nativeShare" class="button secondary" type="button">系统分享</button></div>
   </dialog>
