@@ -3,7 +3,7 @@ const els = Object.fromEntries([
   'serverName','price','currency','currencySymbol','priceCny','tradeDate','dueDate','rate','rateCurrency','rateStatus','refreshRate',
   'remainingCny','remainingOriginal','progressPercent','progressBar','daysRemaining','dueCaption','renewalCny','dailyCost','monthlyCost',
   'usedValue','cycleCaption','premium','salePrice','dealBadge','statusChip','resultTitle','toast','themeButton','resetButton','copyAmount',
-  'copyDetails','shareLink','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink'
+  'copyDetails','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink'
 ].map(id => [id, $(id)]));
 
 const symbols = {USD:'$',EUR:'€',GBP:'£',JPY:'¥',HKD:'HK$',TWD:'NT$',SGD:'S$',AUD:'A$',CAD:'C$',CNY:'¥'};
@@ -177,7 +177,7 @@ function resultText() {
     `- 续费：${els.price.value||0} ${els.currency.value} / ${cycleNames[cycleDays]}（约 ¥${fmt(toNumber(els.price)*toNumber(els.rate))}）\n`+
     `- 交易日期：${els.tradeDate.value||'-'}\n- 到期日期：${els.dueDate.value||'-'}\n`+
     `- 剩余：${els.daysRemaining.textContent} 天，价值 ¥${fmt(remainingCny)}（约 ${fmt(remainingOriginal)} ${els.currency.value}）\n`+
-    `- 溢价 / 折价：${premium>=0?'+':''}¥${fmt(premium)}\n- 建议售价：¥${fmt(sale)}\n`+
+    `- 溢价 / 折价：${premium>=0?'+':''}¥${fmt(premium)}\n- 售出价格：¥${fmt(sale)}\n`+
     `- 汇率：1 ${els.currency.value} ≈ ${els.rate.value} CNY`;
 }
 function shareUrl() {
@@ -238,8 +238,7 @@ function bindEvents() {
   els.refreshRate.addEventListener('click',()=>fetchRate(true)); els.themeButton.addEventListener('click',toggleTheme); els.resetButton.addEventListener('click',resetAll);
   els.copyAmount.addEventListener('click',()=>copyText(fmt(remainingCny),'金额已复制'));
   els.copyDetails.addEventListener('click',()=>copyText(resultText(),'计算结果已复制'));
-  els.shareLink.addEventListener('click',()=>copyText(shareMarkdown(),'Markdown 分享链接已复制'));
-  els.exportImage.addEventListener('click',generateImage); els.closeDialog.addEventListener('click',()=>els.imageDialog.close());
+  els.exportImage.addEventListener('click',()=>{copyText(shareMarkdown(),'Markdown 链接已复制');generateImage();}); els.closeDialog.addEventListener('click',()=>els.imageDialog.close());
   els.imageDialog.addEventListener('click',e=>{if(e.target===els.imageDialog)els.imageDialog.close()});
   els.nativeShare.addEventListener('click',async()=>{
     if(!generatedBlob)return; const file=new File([generatedBlob],'vps-value.png',{type:'image/png'});
