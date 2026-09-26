@@ -186,6 +186,12 @@ function shareUrl() {
   Object.entries(values).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,v)});
   return `${location.origin}${location.pathname}?${p.toString()}`;
 }
+function shareMarkdown() {
+  const name=els.serverName.value.trim();
+  const label=(name?`VPS 剩余价值 · ${name}`:'VPS 剩余价值').replace(/[\\`*_[\]<>]/g,'\\$&');
+  const url=shareUrl().replace(/\(/g,'%28').replace(/\)/g,'%29');
+  return `[${label}](${url})`;
+}
 function applyTheme(mode) {
   const dark=mode==='dark'||(mode==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.dataset.theme=dark?'dark':'light';
@@ -232,11 +238,7 @@ function bindEvents() {
   els.refreshRate.addEventListener('click',()=>fetchRate(true)); els.themeButton.addEventListener('click',toggleTheme); els.resetButton.addEventListener('click',resetAll);
   els.copyAmount.addEventListener('click',()=>copyText(fmt(remainingCny),'金额已复制'));
   els.copyDetails.addEventListener('click',()=>copyText(resultText(),'计算结果已复制'));
-  els.shareLink.addEventListener('click',async()=>{
-    const url=shareUrl();
-    if(navigator.share){try{await navigator.share({title:'VPS 剩余价值',text:resultText(),url});return}catch(_){} }
-    copyText(url,'分享链接已复制');
-  });
+  els.shareLink.addEventListener('click',()=>copyText(shareMarkdown(),'Markdown 分享链接已复制'));
   els.exportImage.addEventListener('click',generateImage); els.closeDialog.addEventListener('click',()=>els.imageDialog.close());
   els.imageDialog.addEventListener('click',e=>{if(e.target===els.imageDialog)els.imageDialog.close()});
   els.nativeShare.addEventListener('click',async()=>{
