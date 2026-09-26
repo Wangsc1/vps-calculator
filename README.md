@@ -47,8 +47,6 @@ docker compose up -d
 docker build -t vps-calculator .
 ```
 
-推送到 `main` 或打 `v*` 标签时，GitHub Actions 会自动构建镜像并推送到 Docker Hub（需在仓库 Secrets 中设置 `DOCKERHUB_USERNAME` 和 `DOCKERHUB_TOKEN`）。
-
 ## 许可
 
 本项目采用 Apache License 2.0 授权，详见 [LICENSE](./LICENSE) 与 [NOTICE](./NOTICE)。
