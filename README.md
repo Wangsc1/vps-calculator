@@ -12,14 +12,6 @@
 - 本地保存、复制 Markdown 结果、导出 PNG 卡片（同时复制 Markdown 链接）
 - 纯静态页面，无服务器、无跟踪、无数据上传
 
-## 本地运行
-
-直接打开 `index.html`，或使用任意静态服务器：
-
-```bash
-python3 -m http.server 8080
-```
-
 ## Docker 部署
 
 ```bash
