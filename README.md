@@ -22,7 +22,32 @@ python3 -m http.server 8080
 
 ## 部署
 
+### GitHub Pages
+
 仓库已配置 GitHub Pages，可从 `main` 分支根目录直接发布。
+
+### Docker
+
+```bash
+docker run -d --name vps-calculator --restart unless-stopped \
+  -p 8080:80 wangsc1/vps-calculator:latest
+```
+
+或使用 Docker Compose：
+
+```bash
+docker compose up -d
+```
+
+默认端口为 `8080`，可通过环境变量 `VPS_CALC_PORT` 修改。镜像支持 `linux/amd64` 和 `linux/arm64`。
+
+本地构建：
+
+```bash
+docker build -t vps-calculator .
+```
+
+推送到 `main` 或打 `v*` 标签时，GitHub Actions 会自动构建镜像并推送到 Docker Hub（需在仓库 Secrets 中设置 `DOCKERHUB_USERNAME` 和 `DOCKERHUB_TOKEN`）。
 
 ## 许可
 

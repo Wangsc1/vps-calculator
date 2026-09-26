@@ -1,0 +1,7 @@
+services:
+  vps-calculator:
+    image: ${VPS_CALC_IMAGE:-wangsc1/vps-calculator:latest}
+    container_name: vps-calculator
+    restart: unless-stopped
+    ports:
+      - "${VPS_CALC_PORT:-8080}:80"
