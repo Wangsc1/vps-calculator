@@ -4,4 +4,4 @@ services:
     container_name: vps-calculator
     restart: unless-stopped
     ports:
-      - "${VPS_CALC_PORT:-8080}:80"
+      - "${VPS_CALC_PORT:-20100}:80"
