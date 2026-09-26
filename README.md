@@ -20,13 +20,7 @@
 python3 -m http.server 8080
 ```
 
-## 部署
-
-### GitHub Pages
-
-仓库已配置 GitHub Pages，可从 `main` 分支根目录直接发布。
-
-### Docker
+## Docker 部署
 
 ```bash
 docker run -d --name vps-calculator --restart unless-stopped \
