@@ -92,6 +92,19 @@ function updateCurrencyUi() {
   els.refreshRate.disabled=code==='CNY';
 }
 function calculate({syncDeal=true}={}) {
+  for(const id of ['tradeDate','dueDate']) {
+    const input=els[id];
+    let label=input.parentElement.querySelector('.date-display');
+    if(!label) {
+      label=document.createElement('span');
+      label.className='date-display';
+      label.setAttribute('aria-hidden','true');
+      input.before(label);
+      input.parentElement.classList.add('has-date-display');
+    }
+    const parts=input.value.split('-');
+    label.textContent=parts.length===3?`${parts[0]}年${Number(parts[1])}月${Number(parts[2])}日`:'选择日期';
+  }
   const price=Math.max(0,toNumber(els.price));
   const rate=els.currency.value==='CNY'?1:Math.max(0,toNumber(els.rate));
   const renewal=price*rate;
@@ -240,6 +253,7 @@ function resetAll() {
 }
 function bindEvents() {
   ['serverName','price','tradeDate','dueDate','rate'].forEach(id=>els[id].addEventListener('input',()=>calculate()));
+  ['tradeDate','dueDate'].forEach(id=>els[id].addEventListener('change',()=>calculate()));
   els.currency.addEventListener('change',()=>fetchRate(false));
   document.querySelectorAll('#cycleOptions button').forEach(btn=>btn.addEventListener('click',()=>{
     cycleDays=Number(btn.dataset.days); document.querySelectorAll('#cycleOptions button').forEach(b=>b.classList.toggle('active',b===btn)); calculate();
