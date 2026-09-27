@@ -218,7 +218,7 @@ async function generateImage() {
   if(!window.htmlToImage) { showToast('图片模块加载失败，请稍后重试'); return; }
   els.imageDialog.showModal(); els.generatedImage.style.display='none';
   els.imageStage.querySelector('.spinner').style.display='block';
-  const calculator=$('calculator');
+  const calculator=$('calculator').querySelector('.result-panel');
   const actions=calculator.querySelector('.action-grid');
   const previousStyle=actions.getAttribute('style');
   actions.style.display='none';
