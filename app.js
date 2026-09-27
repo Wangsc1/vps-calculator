@@ -195,7 +195,7 @@ function shareMarkdown() {
 function applyTheme(mode) {
   const dark=mode==='dark'||(mode==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.dataset.theme=dark?'dark':'light';
-  document.querySelector('meta[name="theme-color"]').content=dark?'#08111f':'#f4f7fb';
+  document.querySelector('meta[name="theme-color"]').content=dark?'#181818':'#f4f7fb';
 }
 function toggleTheme() {
   const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
@@ -205,11 +205,18 @@ async function generateImage() {
   if(!window.htmlToImage) { showToast('图片模块加载失败，请稍后重试'); return; }
   els.imageDialog.showModal(); els.generatedImage.style.display='none';
   els.imageStage.querySelector('.spinner').style.display='block';
-  document.body.classList.add('capture-mode');
+  const calculator=$('calculator');
+  const actions=calculator.querySelector('.action-grid');
+  const previousStyle=actions.getAttribute('style');
+  actions.style.display='none';
   try {
     await document.fonts.ready;
-    const width=Math.min(1120,Math.max(760,$('calculator').scrollWidth));
-    const dataUrl=await htmlToImage.toPng($('calculator'),{pixelRatio:2,cacheBust:true,backgroundColor:getComputedStyle(document.body).backgroundColor,width});
+    // Match the canvas to the rendered layout; widening only the clone leaves
+    // mobile child columns at their original width and creates blank space.
+    const bounds=calculator.getBoundingClientRect();
+    const width=Math.ceil(bounds.width);
+    const height=Math.ceil(bounds.height);
+    const dataUrl=await htmlToImage.toPng(calculator,{pixelRatio:2,cacheBust:true,backgroundColor:getComputedStyle(document.body).backgroundColor,width,height,style:{boxShadow:'none'}});
     const blob=await (await fetch(dataUrl)).blob(); generatedBlob=blob;
     const url=URL.createObjectURL(blob);
     if(els.generatedImage.src.startsWith('blob:')) URL.revokeObjectURL(els.generatedImage.src);
@@ -217,7 +224,11 @@ async function generateImage() {
     els.downloadImage.download=`vps-value-${localDateString()}.png`;
     els.generatedImage.style.display='block';
   } catch(err) { console.error(err); els.imageDialog.close(); showToast('图片生成失败'); }
-  finally { document.body.classList.remove('capture-mode'); els.imageStage.querySelector('.spinner').style.display='none'; }
+  finally {
+    if(previousStyle===null) actions.removeAttribute('style');
+    else actions.setAttribute('style',previousStyle);
+    els.imageStage.querySelector('.spinner').style.display='none';
+  }
 }
 function resetAll() {
   if(!confirm('确定清空当前数据并恢复默认值吗？')) return;
@@ -238,7 +249,7 @@ function bindEvents() {
   els.refreshRate.addEventListener('click',()=>fetchRate(true)); els.themeButton.addEventListener('click',toggleTheme); els.resetButton.addEventListener('click',resetAll);
   els.copyAmount.addEventListener('click',()=>copyText(fmt(remainingCny),'金额已复制'));
   els.copyDetails.addEventListener('click',()=>copyText(resultText(),'计算结果已复制'));
-  els.exportImage.addEventListener('click',()=>{copyText(shareMarkdown(),'Markdown 链接已复制');generateImage();}); els.closeDialog.addEventListener('click',()=>els.imageDialog.close());
+  els.exportImage.addEventListener('click',generateImage); els.closeDialog.addEventListener('click',()=>els.imageDialog.close());
   els.imageDialog.addEventListener('click',e=>{if(e.target===els.imageDialog)els.imageDialog.close()});
   els.nativeShare.addEventListener('click',async()=>{
     if(!generatedBlob)return; const file=new File([generatedBlob],'vps-value.png',{type:'image/png'});
