@@ -1,4 +1,4 @@
-# VPS Value
+# VPS 剩余价值计算器
 
 一个好用 VPS 剩余价值计算器。
 
@@ -9,7 +9,7 @@
 - 使用 [Frankfurter](https://www.frankfurter.app/) 自动获取汇率，也可手动输入
 - 自动计算日均/月均成本、使用价值、溢价与售出价格
 - 深色/浅色模式、响应式移动端布局
-- 本地保存、复制 Markdown 结果、导出 PNG 卡片（同时复制 Markdown 链接）
+- 本地保存、复制 Markdown 结果、导出 PNG 卡片
 - 纯静态页面，无服务器、无跟踪、无数据上传
 
 ## Docker 部署
