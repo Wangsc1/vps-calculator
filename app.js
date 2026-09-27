@@ -174,7 +174,7 @@ function resultText() {
   const premium=Number.parseFloat(els.premium.value)||0;
   const sale=Number.parseFloat(els.salePrice.value)||remainingCny;
   return `## VPS 剩余价值${els.serverName.value.trim()?` · ${els.serverName.value.trim()}`:''}\n`+
-    `- 续费：${els.price.value||0} ${els.currency.value} / ${cycleNames[cycleDays]}（约 ¥${fmt(toNumber(els.price)*toNumber(els.rate))}）\n`+
+    `- 续费价格：${els.price.value||0} ${els.currency.value} / ${cycleNames[cycleDays]}（约 ¥${fmt(toNumber(els.price)*toNumber(els.rate))}）\n`+
     `- 交易日期：${els.tradeDate.value||'-'}\n- 到期日期：${els.dueDate.value||'-'}\n`+
     `- 剩余：${els.daysRemaining.textContent} 天，价值 ¥${fmt(remainingCny)}（约 ${fmt(remainingOriginal)} ${els.currency.value}）\n`+
     `- 溢价 / 折价：${premium>=0?'+':''}¥${fmt(premium)}\n- 售出价格：¥${fmt(sale)}\n`+
