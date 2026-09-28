@@ -27,6 +27,9 @@ html[data-theme="dark"] dialog::backdrop{background:rgba(0,0,0,.78)}
 @media(max-width:380px){.field-grid.two{grid-template-columns:1fr}.cycle-options{grid-template-columns:repeat(2,1fr)}.hero-value strong{font-size:48px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 html{background:var(--bg);min-height:100%}
+/* Safari 26 samples fixed edge elements for toolbar tint; a neutral backdrop filter opts them out. */
+.ambient,.grid-noise,.toast{-webkit-backdrop-filter:opacity(1);backdrop-filter:opacity(1)}
+.toast:not(.show){visibility:hidden}
 .theme-thumb .system{display:none}
 html[data-theme-mode="system"] .theme-thumb{left:50%;transform:translateX(-50%);color:var(--accent)}
 html[data-theme-mode="system"] .theme-thumb .sun,html[data-theme-mode="system"] .theme-thumb .moon{display:none}
