@@ -205,14 +205,36 @@ function shareMarkdown() {
   const url=shareUrl().replace(/\(/g,'%28').replace(/\)/g,'%29');
   return `[${label}](${url})`;
 }
+const systemTheme=matchMedia('(prefers-color-scheme: dark)');
+const themeModes=['system','light','dark'];
+const themeLabels={system:'跟随系统',light:'日间模式',dark:'夜间模式'};
+let themeMode='system';
 function applyTheme(mode) {
-  const dark=mode==='dark'||(mode==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);
-  document.documentElement.dataset.theme=dark?'dark':'light';
-  document.querySelector('meta[name="theme-color"]').content=dark?'#181818':'#f4f7fb';
+  themeMode=themeModes.includes(mode)?mode:'system';
+  const dark=themeMode==='dark'||(themeMode==='system'&&systemTheme.matches);
+  const theme=dark?'dark':'light';
+  const color=dark?'#181818':'#f4f7fb';
+  document.documentElement.dataset.theme=theme;
+  document.documentElement.dataset.themeMode=themeMode;
+  document.documentElement.style.colorScheme=theme;
+  document.documentElement.style.backgroundColor=color;
+  document.querySelector('meta[name="color-scheme"]').content=theme;
+  document.querySelector('meta[name="theme-color"]').content=color;
+  const next=themeModes[(themeModes.indexOf(themeMode)+1)%themeModes.length];
+  const label=`外观：${themeLabels[themeMode]}；点击切换为${themeLabels[next]}`;
+  els.themeButton.title=label;
+  els.themeButton.setAttribute('aria-label',label);
 }
 function toggleTheme() {
-  const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
-  localStorage.setItem('vps-value-theme',next); applyTheme(next);
+  const next=themeModes[(themeModes.indexOf(themeMode)+1)%themeModes.length];
+  try { localStorage.setItem('vps-value-theme',next); } catch (_) {}
+  applyTheme(next); showToast(themeLabels[next]);
+}
+function initTheme() {
+  let saved='system';
+  try { saved=localStorage.getItem('vps-value-theme')||'system'; } catch (_) {}
+  applyTheme(saved);
+  systemTheme.addEventListener('change',()=>{if(themeMode==='system')applyTheme('system')});
 }
 async function generateImage() {
   if(!window.htmlToImage) { showToast('图片模块加载失败，请稍后重试'); return; }
@@ -272,7 +294,7 @@ function bindEvents() {
   });
 }
 function init() {
-  loadState(); setDefaults(); updateCurrencyUi(); bindEvents(); calculate();
+  initTheme(); loadState(); setDefaults(); updateCurrencyUi(); bindEvents(); calculate();
   const savedRate=cachedRate(els.currency.value);
   if(new URLSearchParams(location.search).has('rate')) calculate();
   else if(savedRate){els.rate.value=savedRate.toFixed(4);els.rateStatus.textContent='本地缓存 · 12 小时有效';calculate()}
