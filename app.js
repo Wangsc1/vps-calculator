@@ -228,7 +228,7 @@ function applyTheme(mode) {
 function toggleTheme() {
   const next=themeModes[(themeModes.indexOf(themeMode)+1)%themeModes.length];
   try { localStorage.setItem('vps-value-theme',next); } catch (_) {}
-  applyTheme(next); showToast(themeLabels[next]);
+  applyTheme(next);
 }
 function initTheme() {
   let saved='system';
