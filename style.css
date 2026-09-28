@@ -29,7 +29,10 @@ html[data-theme="dark"] dialog::backdrop{background:rgba(0,0,0,.78)}
 html{background:var(--bg);min-height:100%}
 /* Safari 26 samples fixed edge elements for toolbar tint; a neutral backdrop filter opts them out. */
 .ambient,.grid-noise,.toast{-webkit-backdrop-filter:opacity(1);backdrop-filter:opacity(1)}
-.toast:not(.show){visibility:hidden}
+.toast:not(.show){display:none}
+html,body{transition:none!important}
+.safari-tint{position:fixed;left:0;right:0;z-index:-1;height:12px;background:var(--bg);pointer-events:none}
+.safari-tint-top{top:-8px}.safari-tint-bottom{bottom:-8px}
 .theme-thumb .system{display:none}
 html[data-theme-mode="system"] .theme-thumb{left:50%;transform:translateX(-50%);color:var(--accent)}
 html[data-theme-mode="system"] .theme-thumb .sun,html[data-theme-mode="system"] .theme-thumb .moon{display:none}
