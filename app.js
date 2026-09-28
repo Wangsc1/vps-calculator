@@ -3,7 +3,7 @@ const els = Object.fromEntries([
   'serverName','price','currency','currencySymbol','priceCny','tradeDate','dueDate','rate','rateCurrency','rateStatus','refreshRate',
   'remainingCny','remainingOriginal','progressPercent','progressBar','daysRemaining','dueCaption','renewalCny','dailyCost','monthlyCost',
   'usedValue','cycleCaption','premium','salePrice','dealBadge','statusChip','resultTitle','toast','themeButton','resetButton','copyAmount',
-  'copyDetails','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink'
+  'copyDetails','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink','imageStatus','copyImage'
 ].map(id => [id, $(id)]));
 
 const symbols = {USD:'$',EUR:'€',GBP:'£',JPY:'¥',HKD:'HK$',TWD:'NT$',SGD:'S$',AUD:'A$',CAD:'C$',CNY:'¥'};
@@ -236,8 +236,28 @@ function initTheme() {
   applyTheme(saved);
   systemTheme.addEventListener('change',()=>{if(themeMode==='system')applyTheme('system')});
 }
+function setImageStatus(text) { els.imageStatus.textContent=text; }
+function canCopyImage() { return !!(navigator.clipboard?.write&&window.ClipboardItem); }
+async function copyImageBlob(source) {
+  if(!canCopyImage()) throw new Error('clipboard image unsupported');
+  // Keep write() inside the click gesture; Safari accepts a Promise that resolves after rendering.
+  await navigator.clipboard.write([new ClipboardItem({'image/png':source})]);
+}
+function exportAndCopyImage() {
+  const blobPromise=generateImage();
+  if(!canCopyImage()) { blobPromise.then(blob=>{if(blob)setImageStatus('当前浏览器不支持复制图片，可长按图片保存')}); return; }
+  copyImageBlob(blobPromise.then(blob=>{if(!blob)throw new Error('image failed');return blob}))
+    .then(()=>setImageStatus('图片已复制到剪贴板'))
+    .catch(()=>blobPromise.then(blob=>{if(blob)setImageStatus('自动复制失败，请点“复制图片”')}));
+}
+async function copyGeneratedImage() {
+  if(!generatedBlob) return;
+  try { await copyImageBlob(generatedBlob); setImageStatus('图片已复制到剪贴板'); }
+  catch(_) { setImageStatus('复制失败，可长按图片保存'); }
+}
 async function generateImage() {
-  if(!window.htmlToImage) { showToast('图片模块加载失败，请稍后重试'); return; }
+  if(!window.htmlToImage) { showToast('图片模块加载失败，请稍后重试'); return null; }
+  generatedBlob=null; setImageStatus('正在生成图片…');
   els.imageDialog.showModal(); els.generatedImage.style.display='none';
   els.imageStage.querySelector('.spinner').style.display='block';
   const calculator=$('calculator').querySelector('.result-panel');
@@ -258,7 +278,8 @@ async function generateImage() {
     els.generatedImage.src=url; els.downloadImage.href=url;
     els.downloadImage.download=`vps-value-${localDateString()}.png`;
     els.generatedImage.style.display='block';
-  } catch(err) { console.error(err); els.imageDialog.close(); showToast('图片生成失败'); }
+    return blob;
+  } catch(err) { console.error(err); els.imageDialog.close(); showToast('图片生成失败'); return null; }
   finally {
     if(previousStyle===null) actions.removeAttribute('style');
     else actions.setAttribute('style',previousStyle);
@@ -285,7 +306,7 @@ function bindEvents() {
   els.refreshRate.addEventListener('click',()=>fetchRate(true)); els.themeButton.addEventListener('click',toggleTheme); els.resetButton.addEventListener('click',resetAll);
   els.copyAmount.addEventListener('click',()=>copyText(fmt(remainingCny),'金额已复制'));
   els.copyDetails.addEventListener('click',()=>copyText(resultText(),'计算结果已复制'));
-  els.exportImage.addEventListener('click',generateImage); els.closeDialog.addEventListener('click',()=>els.imageDialog.close());
+  els.exportImage.addEventListener('click',exportAndCopyImage); els.copyImage.addEventListener('click',copyGeneratedImage); els.closeDialog.addEventListener('click',()=>els.imageDialog.close());
   els.imageDialog.addEventListener('click',e=>{if(e.target===els.imageDialog)els.imageDialog.close()});
   els.nativeShare.addEventListener('click',async()=>{
     if(!generatedBlob)return; const file=new File([generatedBlob],'vps-value.png',{type:'image/png'});

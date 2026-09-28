@@ -11,7 +11,7 @@
   <title>VPS Value · 剩余价值计算器</title>
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./style.css?v=20260928-4">
+  <link rel="stylesheet" href="./style.css?v=20260928-5">
   <script>
     (() => {
       let saved = 'system';
@@ -190,12 +190,12 @@
   <div class="toast" id="toast" role="status"></div>
 
   <dialog id="imageDialog">
-    <div class="dialog-head"><div><strong>分享卡片</strong></div><button id="closeDialog" aria-label="关闭">×</button></div>
+    <div class="dialog-head"><div><strong>分享卡片</strong><small id="imageStatus" role="status" aria-live="polite"></small></div><button id="closeDialog" aria-label="关闭">×</button></div>
     <div class="image-stage" id="imageStage"><span class="spinner"></span><img id="generatedImage" alt="VPS 剩余价值分享卡片"></div>
-    <div class="dialog-actions"><a id="downloadImage" class="button primary" download="vps-value.png">下载 PNG</a><button id="nativeShare" class="button secondary" type="button">系统分享</button></div>
+    <div class="dialog-actions"><button id="copyImage" class="button primary" type="button">复制图片</button><a id="downloadImage" class="button secondary" download="vps-value.png">下载 PNG</a><button id="nativeShare" class="button secondary" type="button">系统分享</button></div>
   </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js" defer></script>
-  <script src="./app.js?v=20260928-3" defer></script>
+  <script src="./app.js?v=20260928-5" defer></script>
 </body>
 </html>
