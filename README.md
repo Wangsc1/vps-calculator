@@ -6,7 +6,7 @@
 
 - 按续费金额、付款周期、交易日和到期日计算剩余价值
 - 支持 USD、EUR、GBP、JPY、HKD、TWD、SGD、AUD、CAD、CNY
-- 使用 [Frankfurter](https://www.frankfurter.app/) 自动获取汇率，也可手动输入
+- 使用 [Frankfurter](https://www.frankfurter.app/) 每次打开自动获取最新汇率，无本地汇率缓存；汇率显示在结算币种旁
 - 自动计算日均/月均成本、使用价值、溢价与售出价格
 - 深色/浅色模式、响应式移动端布局
 - 本地保存、复制 Markdown 结果、导出 PNG 卡片
