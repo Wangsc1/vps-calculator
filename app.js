@@ -9,7 +9,6 @@ const els = Object.fromEntries([
 const symbols = {USD:'$',EUR:'€',GBP:'£',JPY:'¥',HKD:'HK$',TWD:'NT$',SGD:'S$',AUD:'A$',CAD:'C$',CNY:'¥'};
 const cycleNames = {30:'月付',90:'季付',180:'半年付',365:'年付',730:'两年付',1095:'三年付'};
 const STORAGE_KEY = 'vps-value-state-v1';
-const RATE_CACHE = 'vps-value-rates-v1';
 const MS_DAY = 86400000;
 let cycleDays = 365;
 let remainingCny = 0;
@@ -53,7 +52,7 @@ async function copyText(text, message='已复制') {
 function saveState() {
   const state = {
     serverName:els.serverName.value,price:els.price.value,currency:els.currency.value,cycleDays,
-    tradeDate:els.tradeDate.value,dueDate:els.dueDate.value,rate:els.rate.value,
+    tradeDate:els.tradeDate.value,dueDate:els.dueDate.value,
     premium:els.premium.value,salePrice:els.salePrice.value,lastDealEdit
   };
   localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
@@ -62,7 +61,7 @@ function loadState() {
   let state={};
   try { state=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); } catch (_) {}
   const params=new URLSearchParams(location.search);
-  for (const key of ['serverName','price','currency','tradeDate','dueDate','rate','premium','salePrice']) {
+  for (const key of ['serverName','price','currency','tradeDate','dueDate','premium','salePrice']) {
     if (params.has(key)) state[key]=params.get(key);
   }
   if (params.has('cycle')) state.cycleDays=Number(params.get('cycle'));
@@ -71,7 +70,6 @@ function loadState() {
   if (state.currency && symbols[state.currency]) els.currency.value=state.currency;
   if (state.tradeDate) els.tradeDate.value=state.tradeDate;
   if (state.dueDate) els.dueDate.value=state.dueDate;
-  if (state.rate) els.rate.value=state.rate;
   if (state.premium!=null) els.premium.value=state.premium;
   if (state.salePrice!=null) els.salePrice.value=state.salePrice;
   cycleDays=cycleNames[state.cycleDays] ? Number(state.cycleDays) : 365;
@@ -151,30 +149,17 @@ function syncDealFields() {
   els.dealBadge.textContent=premium>0?'溢价转让':premium<0?'折价转让':'原价转让';
   els.dealBadge.style.color=premium<0?'var(--red)':premium>0?'var(--green)':'var(--muted)';
 }
-function cachedRate(code) {
-  try {
-    const cache=JSON.parse(localStorage.getItem(RATE_CACHE)||'{}');
-    const item=cache[code];
-    return item && Date.now()-item.time<12*3600e3 ? item.value : null;
-  } catch (_) { return null; }
-}
-function storeRate(code,value) {
-  let cache={}; try{cache=JSON.parse(localStorage.getItem(RATE_CACHE)||'{}')}catch(_){}
-  cache[code]={value,time:Date.now()}; localStorage.setItem(RATE_CACHE,JSON.stringify(cache));
-}
 async function fetchRate(force=false) {
   const code=els.currency.value;
   updateCurrencyUi();
   if(code==='CNY') { els.rate.value='1.0000'; els.rateStatus.textContent='人民币无需换算'; calculate(); return; }
-  const cached=!force&&cachedRate(code);
-  if(cached) { els.rate.value=cached.toFixed(4); els.rateStatus.textContent='本地缓存 · 12 小时有效'; calculate(); return; }
-  els.refreshRate.classList.add('loading'); els.rateStatus.textContent='正在获取实时汇率…';
+  els.refreshRate.classList.add('loading'); els.rateStatus.textContent='正在获取最新汇率…';
   try {
     const res=await fetch(`https://api.frankfurter.dev/v1/latest?from=${encodeURIComponent(code)}&to=CNY`,{cache:'no-store'});
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data=await res.json(); const value=Number(data.rates?.CNY);
     if(!Number.isFinite(value)||value<=0) throw new Error('汇率无效');
-    els.rate.value=value.toFixed(4); storeRate(code,value);
+    els.rate.value=value.toFixed(4);
     els.rateStatus.textContent=`更新于 ${data.date||'今天'}`; calculate();
     if(force) showToast('汇率已更新');
   } catch (err) {
@@ -193,7 +178,7 @@ function resultText() {
 }
 function shareUrl() {
   const p=new URLSearchParams();
-  const values={serverName:els.serverName.value,price:els.price.value,currency:els.currency.value,cycle:cycleDays,tradeDate:els.tradeDate.value,dueDate:els.dueDate.value,rate:els.rate.value,premium:els.premium.value};
+  const values={serverName:els.serverName.value,price:els.price.value,currency:els.currency.value,cycle:cycleDays,tradeDate:els.tradeDate.value,dueDate:els.dueDate.value,premium:els.premium.value};
   Object.entries(values).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,v)});
   return `${location.origin}${location.pathname}?${p.toString()}`;
 }
@@ -309,10 +294,9 @@ function bindEvents() {
 }
 function init() {
   initTheme(); loadState(); setDefaults(); updateCurrencyUi(); bindEvents(); calculate();
-  const savedRate=cachedRate(els.currency.value);
-  if(new URLSearchParams(location.search).has('rate')) calculate();
-  else if(savedRate){els.rate.value=savedRate.toFixed(4);els.rateStatus.textContent='本地缓存 · 12 小时有效';calculate()}
-  else fetchRate(false);
+  // Remove legacy rate caches; every page load requests the provider's latest rate.
+  try { localStorage.removeItem('vps-value-rates-v1'); } catch (_) {}
+  fetchRate(false);
   const repo=document.documentElement.dataset.repo; if(repo)els.githubLink.href=repo;
 }
 init();
