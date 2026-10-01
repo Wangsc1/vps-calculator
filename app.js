@@ -2,13 +2,12 @@ const $ = (id) => document.getElementById(id);
 const els = Object.fromEntries([
   'price','currency','currencySymbol','priceCny','tradeDate','dueDate','currencyRate',
   'remainingCny','remainingOriginal','progressPercent','progressBar','daysRemaining','dueCaption',
-  'premium','salePrice','dealBadge','statusChip','resultTitle','toast','themeButton','resetButton','copyAmount',
+  'premium','salePrice','dealBadge','statusChip','resultTitle','toast','themeButton','copyAmount',
   'copyDetails','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink','imageStatus'
 ].map(id => [id, $(id)]));
 
 const symbols = {USD:'$',EUR:'€',GBP:'£',JPY:'¥',HKD:'HK$',TWD:'NT$',SGD:'S$',AUD:'A$',CAD:'C$',CNY:'¥'};
 const cycleNames = {30:'月付',90:'季付',180:'半年付',365:'年付',730:'两年付',1095:'三年付'};
-const STORAGE_KEY = 'vps-value-state-v1';
 const MS_DAY = 86400000;
 let cycleDays = 365;
 let remainingCny = 0;
@@ -51,18 +50,13 @@ async function copyText(text, message='已复制') {
   }
   showToast(message);
 }
-function saveState() {
-  const state = {
-    price:els.price.value,currency:els.currency.value,cycleDays,
-    tradeDate:els.tradeDate.value,dueDate:els.dueDate.value,
-    premium:els.premium.value,salePrice:els.salePrice.value,lastDealEdit
-  };
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
-}
 function loadState() {
   let state={};
-  try { state=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); } catch (_) {}
-  const params=new URLSearchParams(location.search);
+  els.price.value=''; els.currency.value='USD'; els.premium.value=''; els.salePrice.value='';
+  els.tradeDate.value=''; els.dueDate.value='';
+  const reloading=performance.getEntriesByType('navigation')[0]?.type==='reload';
+  const params=new URLSearchParams(reloading?'':location.search);
+  if(reloading) history.replaceState(null,'',location.pathname);
   for (const key of ['price','currency','tradeDate','dueDate','premium','salePrice']) {
     if (params.has(key)) state[key]=params.get(key);
   }
@@ -129,7 +123,6 @@ function calculate({syncDeal=true}={}) {
   els.statusChip.style.color=days===0?'var(--red)':'var(--accent)';
   els.resultTitle.textContent='当前剩余价值';
   if(syncDeal&&Number.isFinite(remainingCny)) syncDealFields();
-  saveState();
 }
 function syncDealFields() {
   if(lastDealEdit==='sale') {
@@ -266,14 +259,6 @@ async function generateImage() {
     els.imageStage.querySelector('.spinner').style.display='none';
   }
 }
-function resetAll() {
-  if(!confirm('确定清空当前数据并恢复默认值吗？')) return;
-  localStorage.removeItem(STORAGE_KEY); history.replaceState(null,'',location.pathname);
-  els.price.value=''; els.currency.value='USD'; els.premium.value=''; els.salePrice.value='';
-  cycleDays=365; els.tradeDate.value=localDateString(); const due=new Date(); due.setFullYear(due.getFullYear()+1); els.dueDate.value=localDateString(due);
-  document.querySelectorAll('#cycleOptions button').forEach(b=>b.classList.toggle('active',Number(b.dataset.days)===365));
-  fetchRate(); showToast('已重置');
-}
 function bindEvents() {
   ['price','tradeDate','dueDate'].forEach(id=>els[id].addEventListener('input',()=>calculate()));
   ['tradeDate','dueDate'].forEach(id=>els[id].addEventListener('change',()=>calculate()));
@@ -281,9 +266,9 @@ function bindEvents() {
   document.querySelectorAll('#cycleOptions button').forEach(btn=>btn.addEventListener('click',()=>{
     cycleDays=Number(btn.dataset.days); document.querySelectorAll('#cycleOptions button').forEach(b=>b.classList.toggle('active',b===btn)); calculate();
   }));
-  els.premium.addEventListener('input',()=>{lastDealEdit='premium';syncDealFields();saveState()});
-  els.salePrice.addEventListener('input',()=>{lastDealEdit='sale';syncDealFields();saveState()});
-  els.themeButton.addEventListener('click',toggleTheme); els.resetButton.addEventListener('click',resetAll);
+  els.premium.addEventListener('input',()=>{lastDealEdit='premium';syncDealFields()});
+  els.salePrice.addEventListener('input',()=>{lastDealEdit='sale';syncDealFields()});
+  els.themeButton.addEventListener('click',toggleTheme);
   els.copyAmount.addEventListener('click',()=>copyText(fmt(remainingCny),'金额已复制'));
   els.copyDetails.addEventListener('click',()=>copyText(resultText(),'计算结果已复制'));
   els.exportImage.addEventListener('click',exportAndCopyImage); els.closeDialog.addEventListener('click',()=>els.imageDialog.close());
@@ -297,7 +282,7 @@ function bindEvents() {
 function init() {
   initTheme(); loadState(); setDefaults(); updateCurrencyUi(); bindEvents(); calculate();
   // Remove legacy rate caches; every page load requests the provider's latest rate.
-  try { localStorage.removeItem('vps-value-rates-v1'); } catch (_) {}
+  try { localStorage.removeItem('vps-value-rates-v1'); localStorage.removeItem('vps-value-state-v1'); } catch (_) {}
   fetchRate();
   const repo=document.documentElement.dataset.repo; if(repo)els.githubLink.href=repo;
 }
