@@ -81,7 +81,10 @@ function updateCurrencyUi() {
   const code=els.currency.value;
   els.currencySymbol.textContent=symbols[code]||code;
   const rate=code==='CNY'?1:exchangeRate;
-  els.currencyRate.textContent=`· 1 ${code} = ${Number.isFinite(rate)?rate.toFixed(4):'…'} CNY`;
+  const value=document.createElement('span');
+  value.className='exchange-rate-value';
+  value.textContent=Number.isFinite(rate)?rate.toFixed(4):'…';
+  els.currencyRate.replaceChildren(`· 1 ${code} = `,value,' CNY');
 }
 function calculate({syncDeal=true}={}) {
   for(const id of ['tradeDate','dueDate']) {
