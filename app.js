@@ -1,8 +1,8 @@
 const $ = (id) => document.getElementById(id);
 const els = Object.fromEntries([
-  'serverName','price','currency','currencySymbol','priceCny','tradeDate','dueDate','rate','rateCurrency','rateStatus','refreshRate',
-  'remainingCny','remainingOriginal','progressPercent','progressBar','daysRemaining','dueCaption','renewalCny',
-  'usedValue','cycleCaption','premium','salePrice','dealBadge','statusChip','resultTitle','toast','themeButton','resetButton','copyAmount',
+  'price','currency','currencySymbol','priceCny','tradeDate','dueDate','rate','rateCurrency','rateStatus','refreshRate',
+  'remainingCny','remainingOriginal','progressPercent','progressBar','daysRemaining','dueCaption',
+  'premium','salePrice','dealBadge','statusChip','resultTitle','toast','themeButton','resetButton','copyAmount',
   'copyDetails','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink','imageStatus'
 ].map(id => [id, $(id)]));
 
@@ -51,7 +51,7 @@ async function copyText(text, message='已复制') {
 }
 function saveState() {
   const state = {
-    serverName:els.serverName.value,price:els.price.value,currency:els.currency.value,cycleDays,
+    price:els.price.value,currency:els.currency.value,cycleDays,
     tradeDate:els.tradeDate.value,dueDate:els.dueDate.value,
     premium:els.premium.value,salePrice:els.salePrice.value,lastDealEdit
   };
@@ -61,11 +61,10 @@ function loadState() {
   let state={};
   try { state=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}'); } catch (_) {}
   const params=new URLSearchParams(location.search);
-  for (const key of ['serverName','price','currency','tradeDate','dueDate','premium','salePrice']) {
+  for (const key of ['price','currency','tradeDate','dueDate','premium','salePrice']) {
     if (params.has(key)) state[key]=params.get(key);
   }
   if (params.has('cycle')) state.cycleDays=Number(params.get('cycle'));
-  if (state.serverName!=null) els.serverName.value=state.serverName;
   if (state.price!=null) els.price.value=state.price;
   if (state.currency && symbols[state.currency]) els.currency.value=state.currency;
   if (state.tradeDate) els.tradeDate.value=state.tradeDate;
@@ -111,14 +110,10 @@ function calculate({syncDeal=true}={}) {
   let days=0;
   if (trade&&due) days=Math.max(0,Math.ceil((due-trade)/MS_DAY));
   const dailyOriginal=cycleDays?price/cycleDays:0;
-  const dailyCny=dailyOriginal*rate;
   remainingOriginal=dailyOriginal*days;
   remainingCny=remainingOriginal*rate;
-  const periodLeft=Math.min(days,cycleDays);
-  const usedDays=Math.max(0,cycleDays-periodLeft);
   const progressRaw=cycleDays?days/cycleDays*100:0;
   const progressBar=Math.max(0,Math.min(100,progressRaw));
-  const used=dailyCny*usedDays;
 
   els.priceCny.textContent=`≈ ¥${fmt(renewal)}`;
   els.remainingCny.textContent=fmt(remainingCny);
@@ -126,13 +121,10 @@ function calculate({syncDeal=true}={}) {
   els.daysRemaining.textContent=String(days);
   els.progressPercent.textContent=`${Math.round(progressRaw)}%`;
   els.progressBar.style.width=`${progressBar}%`;
-  els.renewalCny.textContent=`¥${fmt(renewal)}`;
-  els.usedValue.textContent=`¥${fmt(used)}`;
-  els.cycleCaption.textContent=cycleNames[cycleDays]||`${cycleDays} 天`;
   els.dueCaption.textContent=due?`${els.dueDate.value} 到期`:'未选择到期日';
   els.statusChip.textContent=!trade||!due?'日期不完整':days===0?'已到期':'有效期内';
   els.statusChip.style.color=days===0?'var(--red)':'var(--accent)';
-  els.resultTitle.textContent=els.serverName.value.trim()||'当前剩余价值';
+  els.resultTitle.textContent='当前剩余价值';
   if(syncDeal) syncDealFields();
   saveState();
 }
@@ -169,7 +161,7 @@ async function fetchRate(force=false) {
 function resultText() {
   const premium=Number.parseFloat(els.premium.value)||0;
   const sale=Number.parseFloat(els.salePrice.value)||remainingCny;
-  return `## VPS 剩余价值${els.serverName.value.trim()?` · ${els.serverName.value.trim()}`:''}\n`+
+  return `## VPS 剩余价值\n`+
     `- 续费价格：${els.price.value||0} ${els.currency.value} / ${cycleNames[cycleDays]}（约 ¥${fmt(toNumber(els.price)*toNumber(els.rate))}）\n`+
     `- 交易日期：${els.tradeDate.value||'-'}\n- 到期日期：${els.dueDate.value||'-'}\n`+
     `- 剩余：${els.daysRemaining.textContent} 天，价值 ¥${fmt(remainingCny)}（约 ${fmt(remainingOriginal)} ${els.currency.value}）\n`+
@@ -178,13 +170,12 @@ function resultText() {
 }
 function shareUrl() {
   const p=new URLSearchParams();
-  const values={serverName:els.serverName.value,price:els.price.value,currency:els.currency.value,cycle:cycleDays,tradeDate:els.tradeDate.value,dueDate:els.dueDate.value,premium:els.premium.value};
+  const values={price:els.price.value,currency:els.currency.value,cycle:cycleDays,tradeDate:els.tradeDate.value,dueDate:els.dueDate.value,premium:els.premium.value};
   Object.entries(values).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,v)});
   return `${location.origin}${location.pathname}?${p.toString()}`;
 }
 function shareMarkdown() {
-  const name=els.serverName.value.trim();
-  const label=(name?`VPS 剩余价值 · ${name}`:'VPS 剩余价值').replace(/[\\`*_[\]<>]/g,'\\$&');
+  const label='VPS 剩余价值';
   const url=shareUrl().replace(/\(/g,'%28').replace(/\)/g,'%29');
   return `[${label}](${url})`;
 }
@@ -267,13 +258,13 @@ async function generateImage() {
 function resetAll() {
   if(!confirm('确定清空当前数据并恢复默认值吗？')) return;
   localStorage.removeItem(STORAGE_KEY); history.replaceState(null,'',location.pathname);
-  els.serverName.value=''; els.price.value=''; els.currency.value='USD'; els.premium.value=''; els.salePrice.value='';
+  els.price.value=''; els.currency.value='USD'; els.premium.value=''; els.salePrice.value='';
   cycleDays=365; els.tradeDate.value=localDateString(); const due=new Date(); due.setFullYear(due.getFullYear()+1); els.dueDate.value=localDateString(due);
   document.querySelectorAll('#cycleOptions button').forEach(b=>b.classList.toggle('active',Number(b.dataset.days)===365));
   fetchRate(true); showToast('已重置');
 }
 function bindEvents() {
-  ['serverName','price','tradeDate','dueDate','rate'].forEach(id=>els[id].addEventListener('input',()=>calculate()));
+  ['price','tradeDate','dueDate','rate'].forEach(id=>els[id].addEventListener('input',()=>calculate()));
   ['tradeDate','dueDate'].forEach(id=>els[id].addEventListener('change',()=>calculate()));
   els.currency.addEventListener('change',()=>fetchRate(false));
   document.querySelectorAll('#cycleOptions button').forEach(btn=>btn.addEventListener('click',()=>{
