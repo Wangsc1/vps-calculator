@@ -37,3 +37,4 @@ html,body{transition:none!important}
 html[data-theme-mode="system"] .theme-thumb{left:50%;transform:translateX(-50%);color:var(--accent)}
 html[data-theme-mode="system"] .theme-thumb .sun,html[data-theme-mode="system"] .theme-thumb .moon{display:none}
 html[data-theme-mode="system"] .theme-thumb .system{display:block}
+@media(max-width:900px){.input-panel{padding-bottom:12px}.input-panel>.field-grid:last-child>.field{margin-bottom:0}}
