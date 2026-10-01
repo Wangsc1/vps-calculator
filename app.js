@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 const els = Object.fromEntries([
   'price','currency','currencySymbol','priceCny','tradeDate','dueDate','currencyRate',
   'remainingCny','remainingOriginal','progressPercent','progressBar','daysRemaining','dueCaption',
-  'premium','salePrice','dealBadge','statusChip','resultTitle','toast','themeButton','copyAmount',
+  'premium','salePrice','dealBadge','statusChip','resultTitle','toast','themeButton',
   'copyDetails','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink','imageStatus'
 ].map(id => [id, $(id)]));
 
@@ -116,7 +116,7 @@ function calculate({syncDeal=true}={}) {
   const hasRate=Number.isFinite(rate);
   els.priceCny.textContent=`≈ ¥${hasRate?fmt(renewal):'—'}`;
   els.remainingCny.textContent=hasRate?fmt(remainingCny):'—';
-  for(const id of ['copyAmount','copyDetails','exportImage','premium','salePrice']) els[id].disabled=!hasRate;
+  for(const id of ['copyDetails','exportImage','premium','salePrice']) els[id].disabled=!hasRate;
   els.remainingOriginal.textContent=`≈ ${fmt(remainingOriginal)} ${els.currency.value}`;
   els.daysRemaining.textContent=String(days);
   els.progressPercent.textContent=`${Math.round(progressRaw)}%`;
@@ -272,7 +272,6 @@ function bindEvents() {
   els.premium.addEventListener('input',()=>{lastDealEdit='premium';syncDealFields()});
   els.salePrice.addEventListener('input',()=>{lastDealEdit='sale';syncDealFields()});
   els.themeButton.addEventListener('click',toggleTheme);
-  els.copyAmount.addEventListener('click',()=>copyText(fmt(remainingCny),'金额已复制'));
   els.copyDetails.addEventListener('click',()=>copyText(resultText(),'计算结果已复制'));
   els.exportImage.addEventListener('click',exportAndCopyImage); els.closeDialog.addEventListener('click',()=>els.imageDialog.close());
   els.imageDialog.addEventListener('click',e=>{if(e.target===els.imageDialog)els.imageDialog.close()});
