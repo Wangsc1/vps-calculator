@@ -237,9 +237,10 @@ async function generateImage() {
   els.imageDialog.showModal(); els.generatedImage.style.display='none';
   els.imageStage.querySelector('.spinner').style.display='block';
   const calculator=$('calculator').querySelector('.result-panel');
-  const actions=calculator.querySelector('.action-grid');
-  const previousStyle=actions.getAttribute('style');
-  actions.style.display='none';
+  // Elements shown on the page but omitted from the exported card.
+  const hidden=[calculator.querySelector('.action-grid'),calculator.querySelector('.deal-heading small')].filter(Boolean);
+  const previousStyles=hidden.map(e=>e.getAttribute('style'));
+  hidden.forEach(e=>{e.style.display='none'});
   try {
     await document.fonts.ready;
     // Match the canvas to the rendered layout; widening only the clone leaves
@@ -257,8 +258,10 @@ async function generateImage() {
     return blob;
   } catch(err) { console.error(err); els.imageDialog.close(); showToast('图片生成失败'); return null; }
   finally {
-    if(previousStyle===null) actions.removeAttribute('style');
-    else actions.setAttribute('style',previousStyle);
+    hidden.forEach((e,i)=>{
+      if(previousStyles[i]===null) e.removeAttribute('style');
+      else e.setAttribute('style',previousStyles[i]);
+    });
     els.imageStage.querySelector('.spinner').style.display='none';
   }
 }
