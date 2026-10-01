@@ -1,7 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const els = Object.fromEntries([
   'serverName','price','currency','currencySymbol','priceCny','tradeDate','dueDate','rate','rateCurrency','rateStatus','refreshRate',
-  'remainingCny','remainingOriginal','progressPercent','progressBar','daysRemaining','dueCaption','renewalCny','dailyCost','monthlyCost',
+  'remainingCny','remainingOriginal','progressPercent','progressBar','daysRemaining','dueCaption','renewalCny',
   'usedValue','cycleCaption','premium','salePrice','dealBadge','statusChip','resultTitle','toast','themeButton','resetButton','copyAmount',
   'copyDetails','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink','imageStatus'
 ].map(id => [id, $(id)]));
@@ -129,8 +129,6 @@ function calculate({syncDeal=true}={}) {
   els.progressPercent.textContent=`${Math.round(progressRaw)}%`;
   els.progressBar.style.width=`${progressBar}%`;
   els.renewalCny.textContent=`¥${fmt(renewal)}`;
-  els.dailyCost.textContent=`¥${fmt(dailyCny)}`;
-  els.monthlyCost.textContent=`¥${fmt(dailyCny*30)}`;
   els.usedValue.textContent=`¥${fmt(used)}`;
   els.cycleCaption.textContent=cycleNames[cycleDays]||`${cycleDays} 天`;
   els.dueCaption.textContent=due?`${els.dueDate.value} 到期`:'未选择到期日';
