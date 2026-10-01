@@ -58,12 +58,7 @@
     </header>
 
     <main class="calculator" id="calculator">
-      <section class="panel input-panel">
-        <div class="section-heading">
-          <div><span class="eyebrow">输入</span><h1>计算参数</h1></div>
-          <span class="privacy-pill"><i></i> 数据仅在本机计算</span>
-        </div>
-
+      <section class="panel input-panel" aria-label="计算参数">
         <div class="field-grid two price-currency-grid">
           <div class="field">
             <label for="price">续费金额 <span id="priceCny">≈ ¥0.00</span></label>
@@ -114,12 +109,7 @@
         </div>
 
       </section>
-      <section class="panel result-panel">
-        <div class="result-head">
-          <div><span class="eyebrow">结果</span><h2 id="resultTitle">当前剩余价值</h2></div>
-          <span class="status-chip" id="statusChip">计算中</span>
-        </div>
-
+      <section class="panel result-panel" aria-label="剩余价值计算结果">
         <div class="hero-value">
           <span class="currency-mark">¥</span><strong id="remainingCny">0.00</strong> <small id="remainingOriginal">≈ 0.00 USD</small>
         </div>
@@ -160,6 +150,6 @@
   </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js" defer></script>
-  <script src="./app.js?v=20261001-8" defer></script>
+  <script src="./app.js?v=20261001-9" defer></script>
 </body>
 </html>

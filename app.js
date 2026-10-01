@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 const els = Object.fromEntries([
   'price','currency','currencySymbol','priceCny','tradeDate','dueDate','currencyRate',
   'remainingCny','remainingOriginal','progressPercent','progressBar','daysRemaining','dueCaption',
-  'premium','salePrice','dealBadge','statusChip','resultTitle','toast','themeButton',
+  'premium','salePrice','dealBadge','toast','themeButton',
   'copyDetails','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink','imageStatus'
 ].map(id => [id, $(id)]));
 
@@ -122,9 +122,6 @@ function calculate({syncDeal=true}={}) {
   els.progressPercent.textContent=`${Math.round(progressRaw)}%`;
   els.progressBar.style.width=`${progressBar}%`;
   els.dueCaption.textContent=due?`${els.dueDate.value} 到期`:'未选择到期日';
-  els.statusChip.textContent=!trade||!due?'日期不完整':days===0?'已到期':'有效期内';
-  els.statusChip.style.color=days===0?'var(--red)':'var(--accent)';
-  els.resultTitle.textContent='当前剩余价值';
   if(syncDeal&&Number.isFinite(remainingCny)) syncDealFields();
 }
 function syncDealFields() {
