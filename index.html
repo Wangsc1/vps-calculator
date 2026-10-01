@@ -11,7 +11,7 @@
   <title>VPS Value · 剩余价值计算器</title>
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./style.css?v=20261001-13">
+  <link rel="stylesheet" href="./style.css?v=20261002-1">
   <script>
     (() => {
       let saved = 'system';
@@ -68,7 +68,7 @@
             </div>
           </div>
           <div class="field">
-            <label for="currency" class="currency-label">结算币种 <span id="currencyRate" aria-live="polite">· 汇率 … CNY</span></label>
+            <label for="currency" class="currency-label">币种 <span id="currencyRate" aria-live="polite">· 汇率 … CNY</span></label>
             <div class="input-wrap select-wrap">
               <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
               <select id="currency">
@@ -110,14 +110,15 @@
 
       </section>
       <section class="panel result-panel" aria-label="剩余价值计算结果">
+        <div class="remaining-value-label">剩余价值</div>
         <div class="hero-value">
           <span class="currency-mark">¥</span><strong id="remainingCny">0.00</strong> <small id="remainingOriginal">≈ 0.00 USD</small>
         </div>
 
         <div class="progress-block">
-          <div class="progress-meta"><span><i></i>剩余周期</span><strong id="progressPercent">0%</strong></div>
+          <div class="progress-meta"><span>剩余周期</span><strong id="progressPercent">0%</strong></div>
           <div class="progress-track"><span id="progressBar"></span></div>
-          <div class="progress-caption"><span><b id="daysRemaining">0</b> 天剩余</span><span id="dueCaption">未选择到期日</span></div>
+          <div class="progress-caption"><span class="days-caption"><span>剩余</span><span class="day-space"> </span><b id="daysRemaining">0</b><span class="day-space"> </span><span>天</span></span><span id="dueCaption">未选择到期日</span></div>
         </div>
 
         <div class="deal-card">
@@ -150,6 +151,6 @@
   </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js" defer></script>
-  <script src="./app.js?v=20261001-9" defer></script>
+  <script src="./app.js?v=20261002-1" defer></script>
 </body>
 </html>
