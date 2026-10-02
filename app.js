@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 const els = Object.fromEntries([
   'price','currency','currencySymbol','priceCny','tradeDate','dueDate','currencyRate',
   'remainingCny','remainingOriginal','progressPercent','progressBar','daysRemaining','dueCaption',
-  'premium','salePrice','dealBadge','toast','themeButton',
+  'premium','salePrice','toast','themeButton',
   'copyDetails','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink','imageStatus'
 ].map(id => [id, $(id)]));
 
@@ -136,9 +136,6 @@ function syncDealFields() {
     const value=Number.isFinite(premium)?premium:0;
     els.salePrice.value=(remainingCny+value).toFixed(2);
   }
-  const premium=Number.parseFloat(els.premium.value)||0;
-  els.dealBadge.textContent=premium>0?'溢价转让':premium<0?'折价转让':'原价转让';
-  els.dealBadge.style.color=premium<0?'var(--red)':premium>0?'var(--green)':'var(--muted)';
 }
 async function fetchRate() {
   const code=els.currency.value;
