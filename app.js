@@ -244,7 +244,8 @@ async function generateImage() {
     const premium=Number.parseFloat(els.premium.value)||0;
     const badge=$('exportDealBadge');
     badge.textContent=premium>0?'溢价转让':premium<0?'折价转让':'原价转让';
-    badge.style.backgroundColor=premium<0?'#15803d':premium>0?'#dc2626':'#2563eb';
+    // Sampled from the user's reference progress bar: left, right, midpoint.
+    badge.style.backgroundColor=premium<0?'#6bd1af':premium>0?'#8490f6':'#72b1d1';
     calculator.classList.add('exporting-card');
     await document.fonts.ready;
     // Match the canvas to the rendered layout; widening only the clone leaves
