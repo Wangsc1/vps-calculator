@@ -68,7 +68,7 @@ function loadState() {
   if (state.premium!=null) els.premium.value=state.premium;
   if (state.salePrice!=null) els.salePrice.value=state.salePrice;
   cycleDays=cycleNames[state.cycleDays] ? Number(state.cycleDays) : 365;
-  lastDealEdit=state.lastDealEdit==='sale'?'sale':'premium';
+  lastDealEdit=state.salePrice!=null?'sale':'premium';
   document.querySelectorAll('#cycleOptions button').forEach(b=>b.classList.toggle('active',Number(b.dataset.days)===cycleDays));
 }
 function setDefaults() {
@@ -164,7 +164,7 @@ async function fetchRate() {
 }
 function resultText() {
   const premium=Number.parseFloat(els.premium.value)||0;
-  const sale=Number.parseFloat(els.salePrice.value)||remainingCny;
+  const sale=toNumber(els.salePrice,remainingCny);
   return `## VPS 剩余价值\n`+
     `- 续费价格：${els.price.value||0} ${els.currency.value} / ${cycleNames[cycleDays]}（约 ¥${fmt(toNumber(els.price)*(els.currency.value==='CNY'?1:exchangeRate))}）\n`+
     `- 交易日期：${els.tradeDate.value||'-'}\n- 到期日期：${els.dueDate.value||'-'}\n`+
@@ -174,7 +174,7 @@ function resultText() {
 }
 function shareUrl() {
   const p=new URLSearchParams();
-  const values={price:els.price.value,currency:els.currency.value,cycle:cycleDays,tradeDate:els.tradeDate.value,dueDate:els.dueDate.value,premium:els.premium.value};
+  const values={price:els.price.value,currency:els.currency.value,cycle:cycleDays,tradeDate:els.tradeDate.value,dueDate:els.dueDate.value,salePrice:els.salePrice.value};
   Object.entries(values).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,v)});
   return `${location.origin}${location.pathname}?${p.toString()}`;
 }
@@ -275,7 +275,6 @@ function bindEvents() {
   document.querySelectorAll('#cycleOptions button').forEach(btn=>btn.addEventListener('click',()=>{
     cycleDays=Number(btn.dataset.days); document.querySelectorAll('#cycleOptions button').forEach(b=>b.classList.toggle('active',b===btn)); calculate();
   }));
-  els.premium.addEventListener('input',()=>{lastDealEdit='premium';syncDealFields()});
   els.salePrice.addEventListener('input',()=>{lastDealEdit='sale';syncDealFields()});
   els.themeButton.addEventListener('click',toggleTheme);
   els.copyDetails.addEventListener('click',()=>copyText(resultText(),'计算结果已复制'));

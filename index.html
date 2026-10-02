@@ -11,7 +11,7 @@
   <title>VPS Value · 剩余价值计算器</title>
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./style.css?v=20261002-export-badge-4">
+  <link rel="stylesheet" href="./style.css?v=20261002-sale-input-3">
   <script>
     (() => {
       let saved = 'system';
@@ -122,10 +122,10 @@
         </div>
 
         <div class="deal-card">
-          <div class="deal-heading"><div><span>交易估值</span><small>任意输入一项，另一项自动计算</small></div></div>
+          <div class="deal-heading"><div><span>交易估值</span><small>输入售出价格自动计算</small></div></div>
           <div class="deal-fields">
-            <label><span>溢价 / 折价</span><div><b>¥</b><input id="premium" type="number" step="0.01" inputmode="decimal" placeholder="0.00"><span class="export-deal-badge" id="exportDealBadge" aria-hidden="true">原价转让</span></div></label>
             <label><span>售出价格</span><div><b>¥</b><input id="salePrice" type="number" step="0.01" inputmode="decimal" placeholder="0.00"></div></label>
+            <label><span>溢价 / 折价</span><div><b>¥</b><input id="premium" type="number" step="0.01" inputmode="decimal" placeholder="0.00" readonly><span class="export-deal-badge" id="exportDealBadge" aria-hidden="true">原价转让</span></div></label>
           </div>
         </div>
 
@@ -151,6 +151,6 @@
   </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js" defer></script>
-  <script src="./app.js?v=20261002-export-badge-2" defer></script>
+  <script src="./app.js?v=20261002-sale-input-1" defer></script>
 </body>
 </html>
