@@ -55,6 +55,12 @@ html[data-theme-mode="system"] .theme-thumb .system{display:block}
 .days-caption .day-space{white-space:pre}
 .days-caption b{transform:translateY(2px)}
 
+/* Transaction status appears only inside the exported premium field. */
+.export-deal-badge{display:none}
+.exporting-card .export-deal-badge{display:inline-flex;align-items:center;justify-content:center;align-self:stretch;flex-shrink:0;margin:0;padding:0 7px;border-radius:0;background:#2563eb;color:#fff;font-size:9px;font-weight:700;line-height:1.2;white-space:nowrap}
+.exporting-card .deal-fields label>div:has(#premium){overflow:hidden}
+.exporting-card #premium{flex:1;min-width:0;width:0;padding-right:6px}
+
 /* uniform outer/section spacing */
 .input-panel{padding-top:19px}.price-currency-grid>.field{margin-bottom:17px}.cycle-field{margin-bottom:18px}.result-panel{padding-bottom:18px}
 @media(max-width:600px){.input-panel{padding-top:15px}.price-currency-grid>.field{margin-bottom:13px}.cycle-field{margin-bottom:14px}.result-panel{padding-bottom:14px}}

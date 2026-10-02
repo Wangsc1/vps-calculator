@@ -239,6 +239,11 @@ async function generateImage() {
   const previousStyles=hidden.map(e=>e.getAttribute('style'));
   hidden.forEach(e=>{e.style.display='none'});
   try {
+    const premium=Number.parseFloat(els.premium.value)||0;
+    const badge=$('exportDealBadge');
+    badge.textContent=premium>0?'溢价转让':premium<0?'折价转让':'原价转让';
+    badge.style.backgroundColor=premium<0?'#15803d':premium>0?'#dc2626':'#2563eb';
+    calculator.classList.add('exporting-card');
     await document.fonts.ready;
     // Match the canvas to the rendered layout; widening only the clone leaves
     // mobile child columns at their original width and creates blank space.
@@ -255,6 +260,7 @@ async function generateImage() {
     return blob;
   } catch(err) { console.error(err); els.imageDialog.close(); showToast('图片生成失败'); return null; }
   finally {
+    calculator.classList.remove('exporting-card');
     hidden.forEach((e,i)=>{
       if(previousStyles[i]===null) e.removeAttribute('style');
       else e.setAttribute('style',previousStyles[i]);
