@@ -134,7 +134,9 @@ function syncDealFields() {
   } else {
     const premium=Number.parseFloat(els.premium.value);
     const value=Number.isFinite(premium)?premium:0;
-    els.salePrice.value=(remainingCny+value).toFixed(2);
+    if(document.activeElement!==els.salePrice) {
+      els.salePrice.value=(remainingCny+value).toFixed(2);
+    }
   }
 }
 async function fetchRate() {
@@ -275,6 +277,14 @@ function bindEvents() {
   document.querySelectorAll('#cycleOptions button').forEach(btn=>btn.addEventListener('click',()=>{
     cycleDays=Number(btn.dataset.days); document.querySelectorAll('#cycleOptions button').forEach(b=>b.classList.toggle('active',b===btn)); calculate();
   }));
+  els.salePrice.addEventListener('focus',()=>{
+    // Clear only the automatic amount before typing begins. Do not intercept
+    // native insertion or selection: mobile number keyboards need both intact.
+    if(lastDealEdit!=='sale') els.salePrice.value='';
+  });
+  els.salePrice.addEventListener('blur',()=>{
+    if(lastDealEdit!=='sale') syncDealFields();
+  });
   els.salePrice.addEventListener('input',()=>{lastDealEdit='sale';syncDealFields()});
   els.themeButton.addEventListener('click',toggleTheme);
   els.copyDetails.addEventListener('click',()=>copyText(resultText(),'计算结果已复制'));

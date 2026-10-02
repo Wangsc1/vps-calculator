@@ -65,6 +65,8 @@ html[data-theme-mode="system"] .theme-thumb .system{display:block}
 
 #price::placeholder{color:#000;opacity:1}
 html[data-theme="dark"] #price::placeholder{color:#fff}
+#salePrice:focus::placeholder{color:#000;opacity:1}
+html[data-theme="dark"] #salePrice:focus::placeholder{color:#fff}
 
 /* uniform outer/section spacing */
 .input-panel{padding-top:19px}.price-currency-grid>.field{margin-bottom:17px}.cycle-field{margin-bottom:18px}.result-panel{padding-bottom:18px}
