@@ -189,6 +189,24 @@ const systemTheme=matchMedia('(prefers-color-scheme: dark)');
 const themeModes=['system','light','dark'];
 const themeLabels={system:'跟随系统',light:'日间模式',dark:'夜间模式'};
 let themeMode='system';
+const sliderModes=['light','system','dark'];
+let themeDragMoved=false;
+function themeRange() {
+  const track=els.themeButton.querySelector('.theme-track');
+  const thumb=els.themeButton.querySelector('.theme-thumb');
+  return Math.max(0,track.clientWidth-thumb.offsetWidth-6);
+}
+function themeOffset(mode) { return themeRange()*sliderModes.indexOf(mode)/2; }
+function updateThemeThumb() {
+  els.themeButton.querySelector('.theme-thumb').dataset.mode=themeMode;
+  els.themeButton.style.setProperty('--theme-x',`${themeOffset(themeMode)}px`);
+  els.themeButton.setAttribute('aria-valuenow',String(sliderModes.indexOf(themeMode)));
+  els.themeButton.setAttribute('aria-valuetext',themeLabels[themeMode]);
+}
+function setThemeMode(mode) {
+  try { localStorage.setItem('vps-value-theme',mode); } catch (_) {}
+  applyTheme(mode);
+}
 function applyTheme(mode) {
   themeMode=themeModes.includes(mode)?mode:'system';
   const dark=themeMode==='dark'||(themeMode==='system'&&systemTheme.matches);
@@ -200,17 +218,60 @@ function applyTheme(mode) {
   document.documentElement.style.backgroundColor=color;
   document.querySelector('meta[name="color-scheme"]').content=theme;
   document.querySelector('meta[name="theme-color"]').content=color;
-  const next=themeModes[(themeModes.indexOf(themeMode)+1)%themeModes.length];
-  const label=`外观：${themeLabels[themeMode]}；点击切换为${themeLabels[next]}`;
+  const label=`外观：${themeLabels[themeMode]}；左右拖动或点击切换`;
   els.themeButton.title=label;
   els.themeButton.setAttribute('aria-label',label);
+  updateThemeThumb();
 }
 function toggleTheme() {
+  if(themeDragMoved) { themeDragMoved=false; return; }
   const next=themeModes[(themeModes.indexOf(themeMode)+1)%themeModes.length];
-  try { localStorage.setItem('vps-value-theme',next); } catch (_) {}
-  applyTheme(next);
+  setThemeMode(next);
+}
+function initThemeSlider() {
+  const button=els.themeButton;
+  const thumb=button.querySelector('.theme-thumb');
+  let drag=null;
+  const modeAt=(offset)=>sliderModes[Math.min(2,Math.max(0,Math.round(offset/(themeRange()||1)*2)))];
+  button.setAttribute('role','slider');
+  button.setAttribute('aria-valuemin','0');
+  button.setAttribute('aria-valuemax','2');
+  button.addEventListener('pointerdown',(event)=>{
+    if(event.pointerType==='mouse'&&event.button!==0) return;
+    drag={id:event.pointerId,startX:event.clientX,startOffset:themeOffset(themeMode),moved:false,mode:themeMode};
+    button.setPointerCapture?.(event.pointerId);
+  });
+  button.addEventListener('pointermove',(event)=>{
+    if(!drag||event.pointerId!==drag.id) return;
+    const dx=event.clientX-drag.startX;
+    if(!drag.moved&&Math.abs(dx)<4) return;
+    drag.moved=true; button.classList.add('dragging');
+    const offset=Math.min(themeRange(),Math.max(0,drag.startOffset+dx));
+    button.style.setProperty('--theme-x',`${offset}px`);
+    drag.mode=modeAt(offset); thumb.dataset.mode=drag.mode;
+  });
+  const finish=(event,cancelled)=>{
+    if(!drag||event.pointerId!==drag.id) return;
+    const finished=drag; drag=null;
+    button.classList.remove('dragging');
+    try { button.releasePointerCapture?.(event.pointerId); } catch (_) {}
+    if(!finished.moved) return;
+    themeDragMoved=true;
+    setTimeout(()=>{themeDragMoved=false},80);
+    if(cancelled) updateThemeThumb(); else setThemeMode(finished.mode);
+  };
+  button.addEventListener('pointerup',(event)=>finish(event,false));
+  button.addEventListener('pointercancel',(event)=>finish(event,true));
+  button.addEventListener('keydown',(event)=>{
+    const step=event.key==='ArrowLeft'?-1:event.key==='ArrowRight'?1:0;
+    if(!step) return;
+    event.preventDefault();
+    setThemeMode(sliderModes[Math.min(2,Math.max(0,sliderModes.indexOf(themeMode)+step))]);
+  });
+  window.addEventListener('resize',updateThemeThumb);
 }
 function initTheme() {
+  initThemeSlider();
   let saved='system';
   try { saved=localStorage.getItem('vps-value-theme')||'system'; } catch (_) {}
   applyTheme(saved);
