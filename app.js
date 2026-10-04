@@ -116,6 +116,8 @@ function calculate({syncDeal=true}={}) {
 
   const hasRate=Number.isFinite(rate);
   els.priceCny.textContent=`≈ ¥${hasRate?fmt(renewal):'—'}`;
+  $('exportRenewalAmount').textContent=`${fmt(price)} ${els.currency.value}`;
+  $('exportRenewalCycle').textContent=cycleNames[cycleDays];
   els.remainingCny.textContent=hasRate?fmt(remainingCny):'—';
   for(const id of ['copyDetails','exportImage','premium','salePrice']) els[id].disabled=!hasRate;
   els.remainingOriginal.textContent=`≈ ${fmt(remainingOriginal)} ${els.currency.value}`;

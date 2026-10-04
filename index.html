@@ -11,7 +11,7 @@
   <title>VPS Value · 剩余价值计算器</title>
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./style.css?v=20261004-deal-gradients-1">
+  <link rel="stylesheet" href="./style.css?v=20261004-dark-background-1">
   <script>
     (() => {
       let saved = 'system';
@@ -110,6 +110,10 @@
 
       </section>
       <section class="panel result-panel" aria-label="剩余价值计算结果">
+        <div class="export-renewal">
+          <div><span>续费金额</span><strong id="exportRenewalAmount">0.00 USD</strong></div>
+          <div><span>续费周期</span><strong id="exportRenewalCycle">年付</strong></div>
+        </div>
         <div class="remaining-value-label">剩余价值</div>
         <div class="hero-value">
           <span class="hero-amount"><span class="currency-mark">¥</span><strong id="remainingCny">0.00</strong></span> <small id="remainingOriginal">≈ 0.00 USD</small>
@@ -150,6 +154,6 @@
   </dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js" defer></script>
-  <script src="./app.js?v=20261004-deal-gradients-1" defer></script>
+  <script src="./app.js?v=20261004-export-renewal-1" defer></script>
 </body>
 </html>
