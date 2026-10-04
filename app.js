@@ -1,7 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const els = Object.fromEntries([
   'price','currency','currencySymbol','priceCny','tradeDate','dueDate','currencyRate',
-  'remainingCny','remainingOriginal','progressPercent','progressBar','daysRemaining','dueCaption',
+  'remainingCny','remainingOriginal','daysRemaining','dueCaption',
   'premium','salePrice','toast','themeButton',
   'copyDetails','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink','imageStatus'
 ].map(id => [id, $(id)]));
@@ -113,8 +113,6 @@ function calculate({syncDeal=true}={}) {
   const dailyOriginal=cycleDays?price/cycleDays:0;
   remainingOriginal=dailyOriginal*days;
   remainingCny=remainingOriginal*rate;
-  const progressRaw=cycleDays?days/cycleDays*100:0;
-  const progressBar=Math.max(0,Math.min(100,progressRaw));
 
   const hasRate=Number.isFinite(rate);
   els.priceCny.textContent=`≈ ¥${hasRate?fmt(renewal):'—'}`;
@@ -122,8 +120,6 @@ function calculate({syncDeal=true}={}) {
   for(const id of ['copyDetails','exportImage','premium','salePrice']) els[id].disabled=!hasRate;
   els.remainingOriginal.textContent=`≈ ${fmt(remainingOriginal)} ${els.currency.value}`;
   els.daysRemaining.textContent=String(days);
-  els.progressPercent.textContent=`${Math.round(progressRaw)}%`;
-  els.progressBar.style.width=`${progressBar}%`;
   els.dueCaption.textContent=due?`${els.dueDate.value} 到期`:'未选择到期日';
   if(syncDeal&&Number.isFinite(remainingCny)) syncDealFields();
 }
@@ -138,6 +134,13 @@ function syncDealFields() {
       els.salePrice.value=(remainingCny+value).toFixed(2);
     }
   }
+  updateDealBadge();
+}
+function updateDealBadge() {
+  const premium=Number.parseFloat(els.premium.value)||0;
+  const badge=$('exportDealBadge');
+  badge.textContent=premium>0?'溢价转让':premium<0?'折价转让':'原价转让';
+  badge.style.background=premium<0?'linear-gradient(135deg,#6bd1af,#34b584)':premium>0?'linear-gradient(135deg,#f58c8c,#e65365)':'linear-gradient(135deg,#72b1d1,#4a8fc7)';
 }
 async function fetchRate() {
   const code=els.currency.value;
@@ -302,11 +305,7 @@ async function generateImage() {
   const previousStyles=hidden.map(e=>e.getAttribute('style'));
   hidden.forEach(e=>{e.style.display='none'});
   try {
-    const premium=Number.parseFloat(els.premium.value)||0;
-    const badge=$('exportDealBadge');
-    badge.textContent=premium>0?'溢价转让':premium<0?'折价转让':'原价转让';
-    // Sampled from the user's reference progress bar: left, right, midpoint.
-    badge.style.backgroundColor=premium<0?'#6bd1af':premium>0?'#8490f6':'#72b1d1';
+    updateDealBadge();
     calculator.classList.add('exporting-card');
     await document.fonts.ready;
     // Match the canvas to the rendered layout; widening only the clone leaves
