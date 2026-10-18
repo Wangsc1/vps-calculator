@@ -89,7 +89,7 @@ function updateCurrencyUi() {
   caption.textContent='汇率';
   els.currencyRate.replaceChildren('· ',caption,' ',value,' CNY');
 }
-function calculate({syncDeal=true}={}) {
+function calculate() {
   for(const id of ['tradeDate','dueDate']) {
     const input=els[id];
     let label=input.parentElement.querySelector('.date-display');
@@ -123,7 +123,7 @@ function calculate({syncDeal=true}={}) {
   els.remainingOriginal.textContent=`≈ ${fmt(remainingOriginal)} ${els.currency.value}`;
   els.daysRemaining.textContent=String(days);
   els.dueCaption.textContent=due?`${els.dueDate.value} 到期`:'未选择到期日';
-  if(syncDeal&&Number.isFinite(remainingCny)) syncDealFields();
+  if(Number.isFinite(remainingCny)) syncDealFields();
 }
 function syncDealFields() {
   if(lastDealEdit==='sale') {
@@ -178,17 +178,6 @@ function resultText() {
     `- 剩余：${els.daysRemaining.textContent} 天，价值 ¥${fmt(remainingCny)}（约 ${fmt(remainingOriginal)} ${els.currency.value}）\n`+
     `- 溢价 / 折价：${premium>=0?'+':''}¥${fmt(premium)}\n- 售出价格：¥${fmt(sale)}\n`+
     `- 汇率：1 ${els.currency.value} ≈ ${(els.currency.value==='CNY'?1:exchangeRate).toFixed(4)} CNY`;
-}
-function shareUrl() {
-  const p=new URLSearchParams();
-  const values={price:els.price.value,currency:els.currency.value,cycle:cycleDays,tradeDate:els.tradeDate.value,dueDate:els.dueDate.value,salePrice:els.salePrice.value};
-  Object.entries(values).forEach(([k,v])=>{if(v!==''&&v!=null)p.set(k,v)});
-  return `${location.origin}${location.pathname}?${p.toString()}`;
-}
-function shareMarkdown() {
-  const label='VPS 剩余价值';
-  const url=shareUrl().replace(/\(/g,'%28').replace(/\)/g,'%29');
-  return `[${label}](${url})`;
 }
 const systemTheme=matchMedia('(prefers-color-scheme: dark)');
 const themeModes=['system','light','dark'];
@@ -360,7 +349,7 @@ function bindEvents() {
   });
 }
 function init() {
-  initTheme(); loadState(); setDefaults(); updateCurrencyUi(); bindEvents(); calculate();
+  initTheme(); loadState(); setDefaults(); bindEvents();
   // Remove legacy rate caches; every page load requests the provider's latest rate.
   try { localStorage.removeItem('vps-value-rates-v1'); localStorage.removeItem('vps-value-state-v1'); } catch (_) {}
   fetchRate();
