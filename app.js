@@ -143,16 +143,21 @@ function updateDealBadge() {
   badge.textContent=premium>0?'溢价转让':premium<0?'折价转让':'原价转让';
   badge.style.background=premium<0?'linear-gradient(135deg,#6bd1af,#34b584)':premium>0?'linear-gradient(135deg,#f58c8c,#e65365)':'linear-gradient(135deg,#72b1d1,#4a8fc7)';
 }
-async function fetchRate() {
+const RATE_RETRY_MS=[2000,4000,8000,15000,30000];
+let rateRetryTimer=0;
+async function fetchRate(attempt=0) {
+  clearTimeout(rateRetryTimer);
   const code=els.currency.value;
   const requestId=++rateRequestId;
-  exchangeRate=code==='CNY'?1:null;
-  updateCurrencyUi();
-  els.currencyRate.title=code==='CNY'?'人民币无需换算':'正在获取最新汇率';
-  calculate();
+  if(attempt===0) {
+    exchangeRate=code==='CNY'?1:null;
+    updateCurrencyUi();
+    calculate();
+  }
+  els.currencyRate.title=code==='CNY'?'人民币无需换算':attempt?'汇率获取失败，正在自动重试':'正在获取最新汇率';
   if(code==='CNY') return;
   try {
-    const res=await fetch(`https://api.frankfurter.dev/v1/latest?from=${encodeURIComponent(code)}&to=CNY`,{cache:'no-store'});
+    const res=await fetch(`https://api.frankfurter.dev/v1/latest?from=${encodeURIComponent(code)}&to=CNY`,{cache:'no-store',signal:AbortSignal.timeout(8000)});
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const data=await res.json(); const value=Number(data.rates?.CNY);
     if(!Number.isFinite(value)||value<=0) throw new Error('汇率无效');
@@ -163,9 +168,9 @@ async function fetchRate() {
     calculate();
   } catch (err) {
     if(requestId!==rateRequestId) return;
-    els.currencyRate.textContent='· 汇率获取失败';
-    els.currencyRate.title='刷新页面或重新选择币种重试';
-    showToast('汇率获取失败，请刷新页面或重新选择币种');
+    // Keep the "…" placeholder and retry quietly until the rate arrives.
+    els.currencyRate.title='汇率获取失败，正在自动重试';
+    rateRetryTimer=setTimeout(()=>fetchRate(attempt+1),RATE_RETRY_MS[Math.min(attempt,RATE_RETRY_MS.length-1)]);
   }
 }
 function resultText() {
@@ -325,6 +330,8 @@ function bindEvents() {
   ['price','tradeDate','dueDate'].forEach(id=>els[id].addEventListener('input',()=>calculate()));
   ['tradeDate','dueDate'].forEach(id=>els[id].addEventListener('change',()=>calculate()));
   els.currency.addEventListener('change',()=>fetchRate());
+  window.addEventListener('online',()=>{if(exchangeRate==null)fetchRate()});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&exchangeRate==null)fetchRate()});
   document.querySelectorAll('#cycleOptions button').forEach(btn=>btn.addEventListener('click',()=>{
     cycleDays=Number(btn.dataset.days); document.querySelectorAll('#cycleOptions button').forEach(b=>b.classList.toggle('active',b===btn)); calculate();
   }));
