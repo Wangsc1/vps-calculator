@@ -6,7 +6,6 @@ const els = Object.fromEntries([
   'copyDetails','exportImage','imageDialog','imageStage','generatedImage','downloadImage','nativeShare','closeDialog','githubLink','imageStatus'
 ].map(id => [id, $(id)]));
 
-const symbols = {USD:'$',EUR:'€',GBP:'£',JPY:'¥',HKD:'HK$',TWD:'NT$',SGD:'S$',AUD:'A$',CAD:'C$',CNY:'¥'};
 const cycleNames = {30:'月付',90:'季付',180:'半年付',365:'年付',730:'两年付',1095:'三年付'};
 const MS_DAY = 86400000;
 let cycleDays = 365;
@@ -62,7 +61,7 @@ function loadState() {
   }
   if (params.has('cycle')) state.cycleDays=Number(params.get('cycle'));
   if (state.price!=null) els.price.value=state.price;
-  if (state.currency && symbols[state.currency]) els.currency.value=state.currency;
+  if (state.currency && [...els.currency.options].some(o=>o.value===state.currency)) els.currency.value=state.currency;
   if (state.tradeDate) els.tradeDate.value=state.tradeDate;
   if (state.dueDate) els.dueDate.value=state.dueDate;
   if (state.premium!=null) els.premium.value=state.premium;
@@ -79,7 +78,7 @@ function setDefaults() {
 }
 function updateCurrencyUi() {
   const code=els.currency.value;
-  els.currencySymbol.textContent=symbols[code]||code;
+  els.currencySymbol.textContent=code;
   const rate=code==='CNY'?1:exchangeRate;
   const value=document.createElement('span');
   value.className='exchange-rate-value';
